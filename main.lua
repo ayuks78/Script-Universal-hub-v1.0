@@ -1,40 +1,56 @@
 -- [[ PAINEL UNIVERSAL-HUB-V1.0 ]]
 -- Codename Devs: @ayuks78 & @GmAI
--- Segurança: Bypass v4 Active | Anti-Kick | Drawing Lib
+-- Segurança: Silent Bypass (Anti-Detection) | RobloxGui_System
 
 local Players = game:GetService("Players")
 local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
-local CoreGui = game:GetService("CoreGui")
 local lp = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- [[ NOTIFICAÇÃO DE VERIFICAÇÃO (SELO AZUL) ]]
+-- [[ 1. SEGURANÇA SILENCIOSA (SUBSTITUIÇÃO DO BYPASS V4) ]]
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RobloxGui_System" -- Nome camuflado conforme solicitado
+
+-- Proteção de Interface contra detecção de GUI
+if gethui then
+    ScreenGui.Parent = gethui()
+elseif syn and syn.protect_gui then
+    syn.protect_gui(ScreenGui)
+else
+    ScreenGui.Parent = game:GetService("CoreGui")
+end
+
+local function ApplySilentBypass()
+    local mt = getrawmetatable(game)
+    local oldNamecall = mt.__namecall
+    setreadonly(mt, false)
+
+    mt.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+
+        -- Ignora chamadas de detecção de segurança comuns sem bloquear o Kick (evita Erro 267)
+        if not checkcaller() then
+            if method == "FireServer" and (self.Name:lower():find("check") or self.Name:lower():find("teleport")) then
+                return nil
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+    setreadonly(mt, true)
+end
+pcall(ApplySilentBypass)
+
+-- [[ NOTIFICAÇÃO DE VERIFICAÇÃO ]]
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Verified Script ✔️",
-    Text = "Universal-Hub-v1.0 loaded. Bypass v4 Protecting.",
+    Title = "Verified System ✔️",
+    Text = "Universal-Hub v1.0: Camouflage Active.",
     Icon = "rbxassetid://6023454774",
-    Duration = 5
+    Duration = 4
 })
 
--- [[ 1. SISTEMA DE SEGURANÇA TRI-BYPASS v4 ]]
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-setreadonly(mt, false)
-mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    if method == "Kick" or method == "kick" then return nil end
-    if method == "FireServer" and (self.Name:find("Detection") or self.Name:find("Check")) then return nil end
-    return oldNamecall(self, ...)
-end)
-setreadonly(mt, true)
-
 -- [[ 2. ESTRUTURA VISUAL ]]
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "UniversalHub_v1.0"
-if syn then syn.protect_gui(ScreenGui) end
-ScreenGui.Parent = CoreGui
-
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 520, 0, 320)
 MainFrame.Position = UDim2.new(0.5, -260, 0.5, -160)
@@ -89,7 +105,7 @@ local EspP = CreatePage("Esp", "◇")
 local SettingsP = CreatePage("Settings", "◇")
 local CreditsP = CreatePage("Credits", "◇")
 
--- [[ 3. FUNÇÕES: AIMBOT & HITBOX ]]
+-- [[ 3. LÓGICA: AIMBOT & HITBOX ]]
 local Aim_Settings = { PlayerAim = false, AutoAim = false, Smoothing = 0.35, MaxDist = 900 }
 local Hitbox_Config = { Enabled = false, Size = 5, Transparency = 0.8 }
 
@@ -176,7 +192,7 @@ AddToggle(MainP, "Hitbox Expander", function(v)
     end
 end)
 
--- SLIDER HITBOX STUDS
+-- SLIDER HITBOX STUDS (CINZA)
 local SFrame = Instance.new("Frame", MainP); SFrame.Size = UDim2.new(1,-20,0,50); SFrame.BackgroundTransparency = 1
 local SLab = Instance.new("TextLabel", SFrame); SLab.Size = UDim2.new(1,0,0,20); SLab.Text = "Hitbox Studs: 5"; SLab.TextColor3 = Color3.fromRGB(180,180,180); SLab.BackgroundTransparency = 1
 local SBar = Instance.new("Frame", SFrame); SBar.Size = UDim2.new(1,0,0,4); SBar.Position = UDim2.new(0,0,0,30); SBar.BackgroundColor3 = Color3.fromRGB(25,25,25)
@@ -216,7 +232,7 @@ end
 for _,p in pairs(Players:GetPlayers()) do CreateESP(p) end; Players.PlayerAdded:Connect(CreateESP)
 AddToggle(EspP, "Esp Player", function(v) E_Config.Enabled = v end)
 
--- ABA SETTINGS (BOOST FPS)
+-- ABA SETTINGS
 AddToggle(SettingsP, "Boost FPS Lite", function(v)
     if v then
         local l = game:GetService("Lighting")
@@ -224,7 +240,7 @@ AddToggle(SettingsP, "Boost FPS Lite", function(v)
         for _,x in pairs(l:GetChildren()) do if x:IsA("PostEffect") then x.Enabled = false end end
     end
 end)
-AddToggle(SettingsP, "Super Boost FPS (BATATA)", function(v)
+AddToggle(SettingsP, "Super Boost FPS", function(v)
     if v then
         for _,x in pairs(game:GetDescendants()) do
             if x:IsA("Part") or x:IsA("MeshPart") then x.Material = Enum.Material.Plastic; x.Color = Color3.fromRGB(180,180,180)
@@ -238,8 +254,7 @@ local CL = Instance.new("TextLabel", CreditsP); CL.Size = UDim2.new(1, -20, 1, -
 CL.Text = [[
 <font color="rgb(255,255,255)">Universal-Hub-v1.0</font>
 <font color="rgb(180,180,180)">Devs:</font> @ayuks78 & @GmAI
-<font color="rgb(255,255,255)">Status:</font> <font color="rgb(0,255,100)">Bypass v4 Active ✔️</font>
-<font color="rgb(150,150,150)">17/01/2026</font>
+<font color="rgb(255,255,255)">Status:</font> <font color="rgb(0,255,100)">Bypass Active ✔️</font>
 ]]
 
 -- [[ 5. BOLINHA MÓVEL ]]
