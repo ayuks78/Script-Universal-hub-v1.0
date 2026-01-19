@@ -24,7 +24,7 @@ local Window = OrionLib:MakeWindow({
     HidePremium = false,
     SaveConfig = true,
     ConfigFolder = "DBR_BlueConfig",
-    IntroEnabled = true,
+    IntroEnabled = false,
     IntroText = "Carregando Módulos v2.0...",
     IntroIcon = "rbxassetid://4483345998"
 })
